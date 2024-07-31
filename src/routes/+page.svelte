@@ -1,25 +1,27 @@
 <script>
+	// @ts-nocheck
+
 	import { onMount } from "svelte";
-	// @ts-ignore
 	import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
-	// @ts-ignore
+
 	let provider = null;
 	let address = "";
 	let errorMessage = "";
 
-	onMount(async () => {
-		// Check if Phantom wallet extension is installed
+	// Function to check if the user is already connected
+	async function checkConnection() {
 		if ("solana" in window) {
 			provider = window.solana;
-			// @ts-ignore
 			if (provider.isPhantom) {
 				try {
-					// Connect to the wallet
-					// @ts-ignore
-					const resp = await provider.connect();
-					address = resp.publicKey.toString();
+					// Check if Phantom is already connected
+					const resp = await provider.connect({
+						onlyIfTrusted: true,
+					});
+					if (resp.publicKey) {
+						address = resp.publicKey.toString();
+					}
 				} catch (error) {
-					// @ts-ignore
 					errorMessage = `Failed to connect: ${error.message}`;
 				}
 			} else {
@@ -28,15 +30,34 @@
 		} else {
 			errorMessage = "Please install Phantom wallet!";
 		}
+	}
+
+	onMount(async () => {
+		await checkConnection();
 	});
 
-	function login() {
-		// @ts-ignore
-		if (provider && address) {
-			// Logic to handle the login state
-			console.log("User address:", address);
+	async function login() {
+		if (provider) {
+			try {
+				const resp = await provider.connect();
+				address = resp.publicKey.toString();
+			} catch (error) {
+				errorMessage = `Failed to connect: ${error.message}`;
+			}
 		} else {
-			console.error("Provider or address is not available");
+			errorMessage = "Provider is not available";
+		}
+	}
+
+	function logout() {
+		if (provider) {
+			try {
+				provider.disconnect();
+				address = "";
+				errorMessage = "Logged out successfully.";
+			} catch (error) {
+				errorMessage = `Failed to logout: ${error.message}`;
+			}
 		}
 	}
 </script>
@@ -49,8 +70,10 @@
 <section>
 	{#if address}
 		<p>Logged in as: {address}</p>
+		<button on:click={logout}>logout</button>
 	{:else}
 		<p>{errorMessage}</p>
+		<button on:click={login}>Login</button>
 	{/if}
 </section>
 
@@ -61,9 +84,5 @@
 		justify-content: center;
 		align-items: center;
 		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
 	}
 </style>

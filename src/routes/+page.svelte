@@ -49,7 +49,6 @@
 <section>
 	{#if address}
 		<p>Logged in as: {address}</p>
-		<button on:click={login}>Check Login</button>
 	{:else}
 		<p>{errorMessage}</p>
 	{/if}

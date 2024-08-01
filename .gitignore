@@ -28,3 +28,5 @@ vite.config.ts.timestamp-*
 !.yarn/sdks
 !.yarn/versions
 .yarn*
+=======
+package-lock.json

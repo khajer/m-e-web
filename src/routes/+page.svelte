@@ -2,11 +2,15 @@
 	// @ts-nocheck
 
 	import { onMount } from "svelte";
-	import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+
+	import { connection, PublicKey } from "../solana";
 
 	let provider = null;
 	let address = "";
 	let errorMessage = "";
+	let balance = 0;
+
+	let list = [];
 
 	// Function to check if the user is already connected
 	async function checkConnection() {
@@ -15,12 +19,23 @@
 			if (provider.isPhantom) {
 				try {
 					// Check if Phantom is already connected
-					const resp = await provider.connect({
+					const connect = await provider.connect({
 						onlyIfTrusted: true,
 					});
-					if (resp.publicKey) {
-						address = resp.publicKey.toString();
+
+					if (connect.publicKey) {
+						address = connect.publicKey.toString();
 					}
+					console.log("address:", address);
+					// connect
+
+					const key = new PublicKey(address);
+					console.log("key");
+					console.log(key);
+					const balanceLamports = await connection.getBalance(key);
+					console.log("balanceLamports", balanceLamports);
+					balance = balanceLamports / 1e9;
+					console.log("balance", balance);
 				} catch (error) {
 					errorMessage = `Failed to connect: ${error.message}`;
 				}
@@ -30,6 +45,32 @@
 		} else {
 			errorMessage = "Please install Phantom wallet!";
 		}
+	}
+
+	async function getListOrder() {
+		console.log("get list order");
+
+		// // Call method_one
+		// let instruction = new solanaWeb3.TransactionInstruction({
+		// 	keys: [],
+		// 	programId,
+		// 	data: Buffer.from([0]), // Instruction data for method_one (0)
+		// });
+		// await sendTransaction(instruction);
+
+		// const other = anchor.web3.Keypair.generate();
+		// const tx = await program.methods
+		// 	.initialize(new anchor.BN(4343234234))
+		// 	.accounts({
+		// 		newAccount: other.publicKey,
+		// 		signer: provider.wallet.publicKey,
+		// 	})
+		// 	.signers([other])
+		// 	.rpc();
+
+		// const acc = await program.account.myAccount.fetch(other.publicKey);
+		// console.log(acc.items);
+		// expect(acc.items.length).equals(0);
 	}
 
 	onMount(async () => {
@@ -60,6 +101,9 @@
 			}
 		}
 	}
+	function saveOrder() {
+		console.log("save");
+	}
 </script>
 
 <svelte:head>
@@ -70,7 +114,24 @@
 <section>
 	{#if address}
 		<p>Logged in as: {address}</p>
-		<button on:click={logout}>logout</button>
+		<div>
+			detail : <input type="text" id="detail" />
+			total : <input type="number" id="total" />
+			<button onclick={saveOrder}>save</button>
+		</div>
+
+		<p />
+		<div class="list">list</div>
+		<table>
+			<thead> <tr><td>list</td><td>total</td></tr></thead>
+			<tbody>
+				{#each list as item}
+					<tr><td></td></tr>
+				{/each}
+			</tbody>
+		</table>
+
+		<!-- <button on:click={logout}>logout</button> -->
 	{:else}
 		<p>{errorMessage}</p>
 		<button on:click={login}>Login</button>

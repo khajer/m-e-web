@@ -28,14 +28,9 @@
 					}
 					console.log("address:", address);
 					// connect
-
 					const key = new PublicKey(address);
-					console.log("key");
-					console.log(key);
-					const balanceLamports = await connection.getBalance(key);
-					console.log("balanceLamports", balanceLamports);
-					balance = balanceLamports / 1e9;
-					console.log("balance", balance);
+					console.log("key", key);
+					getBalance(key);
 				} catch (error) {
 					errorMessage = `Failed to connect: ${error.message}`;
 				}
@@ -47,8 +42,11 @@
 		}
 	}
 
-	async function getListOrder() {
-		console.log("get list order");
+	async function getBalance(key) {
+		const balanceLamports = await connection.getBalance(key);
+		console.log("balanceLamports", balanceLamports);
+		balance = balanceLamports / 1e9;
+		console.log("balance", balance);
 
 		// // Call method_one
 		// let instruction = new solanaWeb3.TransactionInstruction({

@@ -3,7 +3,12 @@
 
 	import { onMount } from "svelte";
 
-	import { connection, PublicKey } from "../solana";
+	import {
+		connection,
+		PublicKey,
+		callMethod,
+		getBalance,
+	} from "../solana.ts";
 
 	let provider = null;
 	let address = "";
@@ -27,10 +32,13 @@
 						address = connect.publicKey.toString();
 					}
 					console.log("address:", address);
-					// connect
 					const key = new PublicKey(address);
 					console.log("key", key);
-					getBalance(key);
+					balance = await getBalance(key);
+					console.log("balance", balance);
+
+					let methodData = "";
+					// callMethod(address, PROGRAM_ID, methodData);
 				} catch (error) {
 					errorMessage = `Failed to connect: ${error.message}`;
 				}
@@ -40,35 +48,6 @@
 		} else {
 			errorMessage = "Please install Phantom wallet!";
 		}
-	}
-
-	async function getBalance(key) {
-		const balanceLamports = await connection.getBalance(key);
-		console.log("balanceLamports", balanceLamports);
-		balance = balanceLamports / 1e9;
-		console.log("balance", balance);
-
-		// // Call method_one
-		// let instruction = new solanaWeb3.TransactionInstruction({
-		// 	keys: [],
-		// 	programId,
-		// 	data: Buffer.from([0]), // Instruction data for method_one (0)
-		// });
-		// await sendTransaction(instruction);
-
-		// const other = anchor.web3.Keypair.generate();
-		// const tx = await program.methods
-		// 	.initialize(new anchor.BN(4343234234))
-		// 	.accounts({
-		// 		newAccount: other.publicKey,
-		// 		signer: provider.wallet.publicKey,
-		// 	})
-		// 	.signers([other])
-		// 	.rpc();
-
-		// const acc = await program.account.myAccount.fetch(other.publicKey);
-		// console.log(acc.items);
-		// expect(acc.items.length).equals(0);
 	}
 
 	onMount(async () => {

@@ -2,13 +2,15 @@
 	// @ts-nocheck
 
 	import { onMount } from "svelte";
-
+	import idl from "../../program/target/idl/money_expense.json";
+	import * as anchor from "@project-serum/anchor";
 	import {
 		connection,
 		PublicKey,
 		callMethod,
 		getBalance,
 	} from "../solana.ts";
+	import { AnchorError } from "@project-serum/anchor";
 
 	let provider = null;
 	let address = "";
@@ -16,6 +18,7 @@
 	let balance = 0;
 
 	let list = [];
+	let programID = "";
 
 	// Function to check if the user is already connected
 	async function checkConnection() {
@@ -37,7 +40,16 @@
 					balance = await getBalance(key);
 					console.log("balance", balance);
 
-					let methodData = "";
+					let anchorProvide = anchor.AnchorProvider(
+						conn,
+						window.solana,
+						{},
+					);
+					anchor.setProvider(anchorProvide);
+					let program = new anchor(idl, programID, anchorProvide);
+					// like a test
+					const tx = await program.methods.initialize().rpc();
+					console.log(tx);
 					// callMethod(address, PROGRAM_ID, methodData);
 				} catch (error) {
 					errorMessage = `Failed to connect: ${error.message}`;

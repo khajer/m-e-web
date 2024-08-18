@@ -41,12 +41,10 @@
 </script>
 
 {#if constructors[1]}
-	
 	<svelte:component this={constructors[0]} bind:this={components[0]} data={data_0}>
 		<svelte:component this={constructors[1]} bind:this={components[1]} data={data_1} {form} />
 	</svelte:component>
 {:else}
-	
 	<svelte:component this={constructors[0]} bind:this={components[0]} data={data_0} {form} />
 {/if}
 

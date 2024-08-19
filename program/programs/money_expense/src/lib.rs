@@ -16,6 +16,7 @@ pub mod money_expense {
         msg!("Greetings from: {:?}", ctx.program_id);
         let ex = Expense { order_name, price };
         ctx.accounts.new_account.orders.push(ex);
+        ctx.accounts.new_account.name = "guest1".to_string();
         Ok(())
     }
 }

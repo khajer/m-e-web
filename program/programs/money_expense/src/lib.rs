@@ -6,15 +6,23 @@ declare_id!("8QYJS7akSyHJEoAg6LZ5oVCMxSGr6Dz9qFciwLz2mQRC");
 pub mod money_expense {
     use super::*;
 
-    pub fn initialize(ctx: Context<Data>) -> Result<()> {
+    pub fn initialize(ctx: Context<Data>, name: String) -> Result<()> {
         msg!("Greetings from: {:?}", ctx.program_id);
+        ctx.accounts.new_account.name = name;
+        Ok(())
+    }
+
+    pub fn add(ctx: Context<Data>, order_name: String, price: u32) -> Result<()> {
+        msg!("Greetings from: {:?}", ctx.program_id);
+        let ex = Expense { order_name, price };
+        ctx.accounts.new_account.orders.push(ex);
         Ok(())
     }
 }
 
 #[derive(Accounts)]
 pub struct Data<'info> {
-    #[account(init, payer = signer, space = 8 + 8 + 24+24)]
+    #[account(init, payer = signer, space = 8 + 56)] // payer = 8, new_account = 56
     pub new_account: Account<'info, MyAccount>,
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -24,7 +32,12 @@ pub struct Data<'info> {
 #[account]
 #[derive(Default)]
 pub struct MyAccount {
-    data: u64,
     name: String,
-    items: Vec<String>,
+    orders: Vec<Expense>,
+}
+
+#[account]
+pub struct Expense {
+    order_name: String,
+    price: u32,
 }

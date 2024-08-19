@@ -1,6 +1,7 @@
 // src/solana.js
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
-import idl from '../../program/target/idl/money_expense.json'
+
+
 
 
 // Connect to the Devnet or any other cluster

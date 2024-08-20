@@ -12,11 +12,11 @@ pub mod money_expense {
         Ok(())
     }
 
-    pub fn add(ctx: Context<Data>, order_name: String, price: u32) -> Result<()> {
-        msg!("Greetings from: {:?}", ctx.program_id);
+    pub fn add(ctx: Context<DataItem>, order_name: String, price: u32) -> Result<()> {
+        let acc = &mut ctx.accounts.acc;
         let ex = Expense { order_name, price };
-        ctx.accounts.new_account.orders.push(ex);
-        ctx.accounts.new_account.name = "guest1".to_string();
+        acc.orders.push(ex);
+
         Ok(())
     }
 }
@@ -28,6 +28,12 @@ pub struct Data<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct DataItem<'info> {
+    #[account(mut)]
+    pub acc: Account<'info, MyAccount>,
 }
 
 #[account]

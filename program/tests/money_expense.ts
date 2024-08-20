@@ -8,7 +8,7 @@ describe("money_expense", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
   const myAccount = anchor.web3.Keypair.generate();
-  const accAddData = anchor.web3.Keypair.generate();
+  // const accAddData = anchor.web3.Keypair.generate();
 
   const program = anchor.workspace.MoneyExpense as Program<MoneyExpense>;
 
@@ -23,14 +23,21 @@ describe("money_expense", () => {
   it("test add expense data", async () => {
 
     const tx = await program.methods.add("dinner", 2300).accounts({
-      newAccount: accAddData.publicKey,
-      signer: provider.wallet.publicKey
-    }).signers([accAddData]).rpc();
+      acc: myAccount.publicKey,
+    }).rpc();
 
     console.log("Your transaction signature", tx);
+    const myAcc = await program.account.myAccount.fetch(myAccount.publicKey);
+    console.log((myAcc));
   });
-  it("check expense data after add ", async () => {
-    const myAcc = await program.account.myAccount.fetch(accAddData.publicKey);
+  it("add another expense data", async () => {
+
+    const tx = await program.methods.add("party", 10300).accounts({
+      acc: myAccount.publicKey,
+    }).rpc();
+    console.log("Your transaction signature", tx);
+
+    const myAcc = await program.account.myAccount.fetch(myAccount.publicKey);
     console.log((myAcc));
   });
 });

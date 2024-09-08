@@ -80,4 +80,26 @@ describe("money_expense", () => {
     const acc = await program.account.myAccount.fetch(newAcc.publicKey);
     console.log((acc));
   });
+
+  it("should found data global state when I setup global state", async () => {
+
+  });
+
+  it.skip("should found data when I add 2 account to one group t", async () => {
+    const acc1 = anchor.web3.Keypair.generate();
+    // const acc2 = anchor.web3.Keypair.generate();
+    const group = [acc1];
+    await program.methods.initialize("kha1").accounts({
+      newAccount: acc1.publicKey,
+      signer: provider.wallet.publicKey
+    }).signers(group).rpc();
+
+    const tx = await program.methods.addName("testman7").accounts({
+      otherAcc: acc1.publicKey,
+    }).rpc();
+    console.log("Your transaction signature", tx);
+
+    const acc = await program.account.myAccount.fetch(acc1.publicKey);
+    console.log((acc));
+  });
 });

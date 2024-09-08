@@ -19,6 +19,16 @@ pub mod money_expense {
 
         Ok(())
     }
+    pub fn add_name(ctx: Context<Dataname>, name: String) -> Result<()> {
+        let acc = &mut ctx.accounts.other_acc;
+        let ex = Expense {
+            order_name: name,
+            price: 0,
+        };
+        acc.orders.push(ex);
+
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -34,6 +44,12 @@ pub struct Data<'info> {
 pub struct DataItem<'info> {
     #[account(mut)]
     pub acc: Account<'info, MyAccount>,
+}
+
+#[derive(Accounts)]
+pub struct Dataname<'info> {
+    #[account(mut)]
+    pub other_acc: Account<'info, MyAccount>,
 }
 
 #[account]

@@ -2,6 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { MoneyExpense } from "../target/types/money_expense";
 import { expect } from "chai";
+import { PublicKey } from '@solana/web3.js'
 
 const provider = anchor.AnchorProvider.local();
 
@@ -82,24 +83,75 @@ describe("money_expense", () => {
   });
 
   it("should found data global state when I setup global state", async () => {
-
-  });
-
-  it.skip("should found data when I add 2 account to one group t", async () => {
     const acc1 = anchor.web3.Keypair.generate();
-    // const acc2 = anchor.web3.Keypair.generate();
-    const group = [acc1];
-    await program.methods.initialize("kha1").accounts({
+    await program.methods.initialize("kha").accounts({
       newAccount: acc1.publicKey,
       signer: provider.wallet.publicKey
-    }).signers(group).rpc();
+    }).signers([acc1]).rpc();
+  });
 
-    const tx = await program.methods.addName("testman7").accounts({
-      otherAcc: acc1.publicKey,
-    }).rpc();
-    console.log("Your transaction signature", tx);
+  it("should found success & one record when I create user stats", async () => {
 
-    const acc = await program.account.myAccount.fetch(acc1.publicKey);
-    console.log((acc));
+    let tx = await program.methods
+      .createUserStats('brian')
+      .accounts({
+        user: provider.wallet.publicKey,
+      })
+      .rpc();
+    const [userStatsPDA, _] = PublicKey.findProgramAddressSync(
+      [
+        anchor.utils.bytes.utf8.encode('user-stats'),
+        provider.wallet.publicKey.toBuffer(),
+      ],
+      program.programId
+    )
+
+    console.log(userStatsPDA);
+
+
+    const acc1 = anchor.web3.Keypair.generate();
+    const acc = await program.account.userStats.fetch(userStatsPDA);
+    expect(acc.name).equal('brian');
+
+
+  });
+  it("should found success when I try to check again", async () => {
+
+    const [userStatsPDA, _] = PublicKey.findProgramAddressSync(
+      [
+        anchor.utils.bytes.utf8.encode('user-stats'),
+        provider.wallet.publicKey.toBuffer(),
+      ],
+      program.programId
+    )
+    const acc1 = anchor.web3.Keypair.generate();
+    const acc = await program.account.userStats.fetch(userStatsPDA);
+    console.log(">>", acc);
+    expect(acc.name).equal('brian');
+  });
+
+  it("should found change name when I change name to 'itsara' ", async () => {
+
+    let tx = await program.methods
+      .changeUserName('itsara', 16)
+      .accounts({
+        user: provider.wallet.publicKey,
+      })
+      .rpc();
+
+
+    const [userStatsPDA, _] = PublicKey.findProgramAddressSync(
+      [
+        anchor.utils.bytes.utf8.encode('user-stats'),
+        provider.wallet.publicKey.toBuffer(),
+      ],
+      program.programId
+    )
+    const acc1 = anchor.web3.Keypair.generate();
+    const acc = await program.account.userStats.fetch(userStatsPDA);
+    console.log(">>", acc);
+    expect(acc.name).equal('itsara');
+    expect(acc.level).equal(16);
+
   });
 });

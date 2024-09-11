@@ -11,7 +11,6 @@ pub mod money_expense {
         ctx.accounts.new_account.name = name;
         Ok(())
     }
-
     pub fn add(ctx: Context<DataItem>, order_name: String, price: u32) -> Result<()> {
         let acc = &mut ctx.accounts.acc;
         let ex = Expense { order_name, price };

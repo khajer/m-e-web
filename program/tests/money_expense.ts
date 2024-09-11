@@ -107,9 +107,6 @@ describe("money_expense", () => {
     )
 
     console.log(userStatsPDA);
-
-
-    const acc1 = anchor.web3.Keypair.generate();
     const acc = await program.account.userStats.fetch(userStatsPDA);
     expect(acc.name).equal('brian');
 
@@ -152,6 +149,17 @@ describe("money_expense", () => {
     console.log(">>", acc);
     expect(acc.name).equal('itsara');
     expect(acc.level).equal(16);
-
   });
+
+
+  it("should found all publickey then i get from program", async () => {
+
+    let allAcount = await provider.connection.getProgramAccounts(program.programId);
+    console.log(allAcount.length);
+    expect(allAcount.length).equal(4);
+    allAcount.forEach(acc => {
+      console.log(acc.pubkey);
+    })
+  });
+
 });
